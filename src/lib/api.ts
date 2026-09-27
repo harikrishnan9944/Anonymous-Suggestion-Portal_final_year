@@ -18,10 +18,21 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
       headers,
     });
     
-    const data = await res.json();
+    const data = await res.json().catch(() => ({
+      success: false,
+      message: `Server returned invalid JSON response (${res.status} ${res.statusText})`
+    }));
+
+    if (!res.ok && data && !data.message) {
+      data.message = `HTTP Error ${res.status}: ${res.statusText}`;
+    }
+
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error(`API Call Error (${endpoint}):`, error);
+    if (error.name === 'TypeError' || error.message?.includes('fetch')) {
+      throw new Error('Unable to connect to backend server (http://localhost:5000). Please make sure the Express backend server is running.');
+    }
     throw error;
   }
 }

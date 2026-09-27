@@ -73,8 +73,8 @@ export default function SubmissionForm() {
       } else {
         setError(res.message || 'Failed to submit feedback. Please try again.');
       }
-    } catch (err) {
-      setError('Connection to server failed. Please check network connection.');
+    } catch (err: any) {
+      setError(err?.message || 'Connection to server failed. Please check network connection.');
     } finally {
       setLoading(false);
     }
