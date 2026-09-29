@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/$/, '');
 
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('asp_admin_token') : null;
@@ -12,8 +12,11 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${API_BASE}${cleanEndpoint}`;
+
   try {
-    const res = await fetch(`${API_BASE}${endpoint}`, {
+    const res = await fetch(url, {
       ...options,
       headers,
     });
@@ -29,9 +32,9 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
 
     return data;
   } catch (error: any) {
-    console.error(`API Call Error (${endpoint}):`, error);
+    console.error(`API Call Error (${url}):`, error);
     if (error.name === 'TypeError' || error.message?.includes('fetch')) {
-      throw new Error(`Unable to connect to backend server (${API_BASE}). Please make sure the Express backend server is running and accessible.`);
+      throw new Error(`Unable to connect to API endpoint (${url}). Please check your server status or network connection.`);
     }
     throw error;
   }
