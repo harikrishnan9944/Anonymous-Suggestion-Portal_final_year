@@ -31,7 +31,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   } catch (error: any) {
     console.error(`API Call Error (${endpoint}):`, error);
     if (error.name === 'TypeError' || error.message?.includes('fetch')) {
-      throw new Error('Unable to connect to backend server (http://localhost:5000). Please make sure the Express backend server is running.');
+      throw new Error(`Unable to connect to backend server (${API_BASE}). Please make sure the Express backend server is running and accessible.`);
     }
     throw error;
   }
